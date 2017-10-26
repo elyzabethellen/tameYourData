@@ -1,0 +1,158 @@
+---
+title: 'Tame Your Data With R: ADVANCE Workshop 2'
+author: "Elizabeth E. Esterly"
+date: "December 4th, 2017, University of New Mexico"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r tidyItUp}
+library(tidyverse)
+```
+```{r DatasetIntoPlace}
+super <- read_csv('superheroes.csv') 
+```
+
+##Transform
+We'll bring in a second dataset here, transform it, and then transform our original dataset by doing a join on superhero names. For brevity's sake, assume this one is already tidied up. 
+```{r bringInSecond, message=FALSE}
+#Import the second set and take a look at the first few rows
+second <- read_csv("~/Desktop/characteristics.csv")
+second %>% head()
+```
+Huh. It looks like the name column repeats itself. Let's get a wider view...
+```{r bringInSecond2, message=FALSE}
+second
+```
+
+###spread and gather
+It definitely does. This data is a great candidate for transformation. Let's break up that status column into separate factors:
+```{r spread}
+#Import the second set and take a look at the first few rows
+secondWide <- second %>% spread(status, measurement)
+secondWide
+```
+
+The Tidyverse `gather` function will help you do the opposite--go from wide to long. To learn more about that function, you can type:
+```{r gather}
+help("gather")
+```
+You can do this with most functions in R to get some more details about them.
+
+Note that the result of `spread` was sorted alphabetically by the first column.
+We really care about who's the fastest, though:
+```{r sortby}
+#Sort by speed
+#ascending order
+secondWide <- secondWide %>% arrange(flyingSpeedmph)
+secondWide
+#descending order
+secondWide <- secondWide %>% arrange(desc(flyingSpeedmph))
+secondWide
+```
+
+This looks like what we want. Let's merge with our `super` dataset.
+
+###joins  
+Don't be scared!  
+
+####inner join(x, y)
+From the documentation:
+```{r helpagain}
+help("inner_join")
+```
+>Return all rows from x where there are matching values in y, and all columns from x and y. If there are multiple matches >between x and y, all combination of the matches are returned. This is a mutating join.
+
+We'll give our `super` dataset as x, because we want to keep all of the characters in `super` that also appear in `secondWide`. `secondWide` will be given second as y.  
+*What is a mutating join?*: It's some database terminology. It just means you can add variables to the LHS.
+```{r inner}
+#Try an inner join
+inner_join(super, secondWide)
+#The Tidyverse way: use pipes for first function argument 'x'
+#Doesn't make a difference here but a good habit to get into
+super %>% inner_join(secondWide)
+```
+Notice we were automatically joined on name. We kept all characters that appeared in *both* datasets and merged all attributes given in both.
+
+
+####semi_join(x, y)  
+>return all rows from x where there are matching values in y, keeping just columns from x
+```{r semi}
+super %>% semi_join(secondWide)
+```
+Here, our names were filtered by just the ones that appeared in both datasets, but we didn't pick up the extra columns from the `secondWide` dataset.
+
+####anti_join(x, y)
+>return all rows from x where there are not matching values in y, keeping just columns from x.
+```{r anti}
+super %>% anti_join(secondWide)
+```
+In this case, we exclude all characters that appear in both x and y but still keep just columns from x.  
+
+####full_join(x, y)  
+>return all rows and all columns from both x and y. Where there are not matching values, returns NA for the one missing.
+```{r full}
+super %>% full_join(secondWide)
+```
+Let's do an anti join one more time and save the result:
+```{r innerAgain}
+result <- super %>% anti_join(secondWide)
+result
+```
+Our dataset has come a long way since the beginning! Let's close by exploring some visualizations.
+
+
+## Visualize
+
+The `ggplot2` library provides an extensive set of tools to help you create beautiful visualizations. It can be hard to get started though, so I suggest looking at great examples, like from this website:
+http://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.html#Ordered%20Bar%20Chart
+and working backwards from there.  
+
+### Categorical bar chart
+Let's compare alignment between the sexes.
+```{r align}
+result %>% ggplot(aes(sex)) +
+  geom_bar(aes(fill=alignment)) 
+```
+
+### Lollipop charts
+```{r lollipop}
+result %>% ggplot(aes(x=name, y=age, label=age )) + 
+  geom_point(stat='identity', fill="black", size=8) +
+  geom_segment(aes(y = 0, 
+                   x = name, 
+                   yend = age, 
+                   xend= name), 
+               color = "black") +
+  coord_flip()
+```
+Loki is throwing things off here. Let's take him out:  
+```{r lollipop2}
+result %>% filter(name != "Loki") %>% ggplot(aes(x=name, y=age, label=age )) + 
+  geom_point(stat='identity', fill="black", size=8) +
+  geom_segment(aes(y = 0, 
+                   x = name, 
+                   yend = age, 
+                   xend= name), 
+               color = "black") +
+  coord_flip()
+```
+Much better!
+
+Let's add a little text in the dots for clarity and set our 'baseline' age to 32:
+```{r lollipop3}
+result %>% filter(name != "Loki") %>% ggplot(aes(x=name, y=age, label=age )) + 
+  geom_point(stat='identity', fill="black", size=8) +
+  geom_segment(aes(y = 32, 
+                   x = name, 
+                   yend = age, 
+                   xend= name), 
+               color = "black") +
+                geom_text(color="white", size=3)+
+  labs(title="Who's older and younger than the Batman?", subtitle="Batman is 32")+
+  coord_flip()
+```
