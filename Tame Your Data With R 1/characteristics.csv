@@ -1,0 +1,11 @@
+name,status,measurement
+Wonder Woman,homePlanet,Themyscira
+Thor,homePlanet,Asgard
+Storm,homePlanet,Earth
+Superman,homePlanet,Krypton
+Deadpool,homePlanet,Earth
+Wonder Woman,flyingSpeedmph,"5,100,000"
+Thor,flyingSpeedmph,24000
+Storm,flyingSpeedmph,1000
+Superman,flyingSpeedmph,"7,200,000"
+Deadpool,flyingSpeedmph,0

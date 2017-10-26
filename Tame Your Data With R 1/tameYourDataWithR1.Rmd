@@ -1,0 +1,164 @@
+---
+title: 'Tame Your Data With R: ADVANCE Workshop 1'
+author: "Elizabeth E. Esterly"
+date: "October 23rd, 2017, University of New Mexico"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+datasets used in this workshop loosely based on several open-source ones provided by Jenny Bryan, University of British Colombia, RStudio and Tidyverse https://github.com/jennybc
+
+DATASET 1: http://cs.unm.edu/~elizabeth/superheroes.csv  
+DATASET 2: http://cs.unm.edu/~elizabeth/characteristics.csv  
+Save these to your Desktop.
+
+##Getting Started
+I didn't install R before the Workshop!   
+  * No problem, go here and follow the instructions: https://goo.gl/Utw4KG  
+Coming from Stata?   
+  * Open this in a new tab: https://goo.gl/XFgudR  
+
+As you follow along with this tutorial in the console, you can store all of the commands in an R script to use and run later. To create a new R script, click the green `+` button in the upper left corner of your window and select `RScript`.  
+*A note about your working directory*: R needs to know where you want to work from. To follow along with this workshop, it's easiest to work right from your Desktop. You can change this working directory at any time. Change your working directory to the Desktop now by going to `Session > Set Working Directory...` and choosing your Desktop.  
+
+In this workshop series, we'll be using the Tidyverse approach to data:  
+* *Import*   
+* *Tidy*    
+* *Transform -> visualize -> model* (repeat as necessary to gain understanding)  
+* *Communicate*  
+The Tidyverse set of libraries include *ggplot2* for plotting, *dplyr* for fast manipulation of dataframes, among others. Let's load them all as one set with:
+
+```{r load, message = FALSE}
+library(tidyverse)
+```
+You might see some conflict messages here. That's fine.  
+Let's begin the Tidyverse workflow.
+
+##Import
+It's great to get a quick feel for the data, especially if we have missing values.  
+`head` shows us the first few rows of our data:
+```{r view1, message = FALSE}
+#load dataset 1, superheroes, and assign it to the variable super
+super <- read_csv("superheroes.csv")
+#look at the first few rows
+head(super)
+```
+`tail` shows us the last few rows:
+```{r view2, message=FALSE}
+#look at the last few rows
+tail(super)
+```
+Looks like we've got some NAs--and 0 values too. We'll deal with those in a minute. 
+
+First, let's get some summary information:
+```{r summary, message = FALSE}
+#get a summary of the data: notice that some values are character and some are numeric
+summary(super)
+```
+
+Tables will give us the whole picture of our factors and levels.
+```{r table, message=FALSE, eval=FALSE}
+#build a contingency table of the counts at each combination of factor levels
+#this is going to be huge
+table(super)
+```
+How about trying this the Tidyverse way?
+```{r tidyTable, message=FALSE, eval=FALSE}
+#use the pipe command to give the super data to the table function
+super %>% table()
+```
+How about a two-way table?
+```{r twoWayTable}
+super %>% select(age, sex) %>% table() 
+```
+
+Our Import is complete and we have a sense of the data! Let move on to Step 2, Tidy.
+
+##Tidy
+It's time to clean up those 0 and NA values we saw earlier.  
+Dealing with two different types of NAs is tough, so let's reimport the data so those `0` values are converted to `NA` also:
+```{r dealWithNAsimport, message = FALSE}
+#load dataset 1, superheroes, and re-assign it to the variable super, reusing this variable to save space 
+#important for very large datasets
+#add a list of entries we want to fill with NA
+super <- read_csv("superheroes.csv", na = c("","0","NA"))
+#look at the first few rows again
+super %>% head()
+#and the last to make sure everything was replaced correctly
+super %>% tail()
+```
+Notice that the 0s in the row below `Joker` have been replaced by `NA`.
+
+###dropping rows with NA values
+R allows us to mess around with our data without mutating the original. In other words, unless we assign something to `super` again, `super` will be in the same state as when we left it. This is both good and bad--once you made the change you want to your data, don't forget to either assign it to your old variable again with `<-` or create a new one, or your changes will be lost!
+
+####drop all rows with NAs
+The nuclear option.
+```{r dropAllNARows}
+#all rows that contain NAs are dropped: Black Widow, Thor, and the nameless row below Joker
+super %>% drop_na()
+```
+
+####drop just rows that have NA's in certain columns 
+Give the column name to the drop_na() function:
+```{r dropsomeNARows}
+#see ya, Black Widow!
+super %>% drop_na(alignment)
+#Bye, Thor!
+super %>% drop_na(age)
+#Or both of you!
+super %>% drop_na(alignment, age)
+#Let's drop that row where we don't know the identity of the entry and save the changes.
+#When you assign the variable, just type its name again to show results.
+super <- super %>% drop_na(name)
+super
+```
+
+####drop a column altogether by name (subsetting/selecting)
+```{r dropNAcol}
+#Drop the publisher column and save the changes.
+super <-super %>% subset(select = -c(publisher))
+super
+```
+
+####fill a numerical NA value
+How old is Thor? 
+More sophisticated types of imputation are beyond the scope of this workshop. Let's get the simple summary stats:
+```{r meansEtc}
+#get the summary of the age column
+super %>% select(age) %>% summary()
+#how about a summary for just the guys?
+super %>% filter(sex == 'male') %>% select(age) %>% summary()
+#how about a summary for just the good guys?
+super %>% filter(sex == 'male') %>% filter(alignment == 'good') %>% select(age) %>% summary()
+```
+Well, that helped us narrow it down a bit. We know Thor's a good guy, so we'll fill Thor's age with the median age for good guys, 29.0.  
+*NOTE: (Filter before Select) Filter is slicing by rows, and select is slicing by columns. You always want to do your row slices first, or you might lose the identifying columns to do them on!* 
+```{r handFill}
+#replace NA in the age column with 29
+super <- super %>% replace_na(list(age = 29))
+#did it work?
+super
+```
+####fill a categorical NA value
+Is Black Widow good or bad?
+Again, some simple imputation techniques for this binary category.
+```{r catNA}
+#what's the modal alignment?
+super %>% select(alignment) %>% table() %>% which.max() %>% names()
+#how about just the women?
+super %>% filter(sex == 'female') %>% select(alignment) %>% table() %>% which.max() %>% names()
+```
+"Good" it is. Try using `replace_na` again, but this time, combine everything into one statement. You don't even have to know the value in advance:
+```{r blindFill}
+super <- super %>% replace_na(list(alignment = super %>% filter(sex == 'female') %>% select(alignment) %>% table() %>% which.max() %>% names()))
+#did it work?
+super
+```
+Goodbye NAs! 
+That completes Part 1 of Tame Your Data With R.
+

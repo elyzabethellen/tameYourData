@@ -1,0 +1,15 @@
+name,alignment,sex,age,publisher
+Black Widow, ,female,38,Marvel
+Magneto,bad,male,93,Marvel
+Storm,good,female,300,Marvel
+Mystique,bad,female,120,Marvel
+Thor,good,male,,Marvel
+Loki,bad,male,1048,Marvel
+Wonder Woman,good,female,5000,DC
+Batman,good,male,32,DC
+Joker,bad,male,46,DC
+0,good,0,,DC
+Harley Quinn,bad,female,27,DC
+Supergirl,good,female,24,DC
+Superman,good,male,29,DC
+Hellboy,good,male,10,Dark Horse
