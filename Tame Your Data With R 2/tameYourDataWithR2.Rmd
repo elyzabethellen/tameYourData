@@ -11,8 +11,8 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 Download these datasets to your desktop.
-DATASET 1: http://cs.unm.edu/~elizabeth/superheroes.csv  
-DATASET 2: http://cs.unm.edu/~elizabeth/characteristics.csv  
+DATASET 1: http://cs.unm.edu/~elizabeth/newSuperheroes.csv  
+DATASET 2: http://cs.unm.edu/~elizabeth/newCharacteristics.csv  
 
 ```{r tidyItUp, message=FALSE}
 #Load the Tidyverse
@@ -58,7 +58,7 @@ super %>% inner_join(second)
 Notice we were automatically joined on name. We kept all characters that appeared in *both* datasets and merged all attributes given in both.
 
 ###spread and gather
-It definitely does. This data is a great candidate for transformation. Let's break up that status column into separate factors:
+This data is a great candidate for transformation. Let's break up that status column into separate factors:
 ```{r spread}
 #Use the spread command to spread the status column out. (Go to "wide.")
 secondWide <- second %>% spread(status, measurement, convert=TRUE)
@@ -82,8 +82,6 @@ secondWide %>% arrange(flyingSpeedmph)
 secondWide %>% arrange(desc(flyingSpeedmph))
 
 ```
-
-This looks like what we want. 
 ####semi_join(x, y)  
 >return all rows from x where there are matching values in y, keeping just columns from x
 ```{r semi}
