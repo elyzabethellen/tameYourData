@@ -1,0 +1,21 @@
+name,status,measurement
+Wonder Woman,homePlanet,Themyscira
+Thor,homePlanet,Asgard
+Storm,homePlanet,Earth
+Superman,homePlanet,Krypton
+Deadpool,homePlanet,Earth
+Wonder Woman,flyingSpeedmph,"5,100,000"
+Thor,flyingSpeedmph,24000
+Storm,flyingSpeedmph,1000
+Superman,flyingSpeedmph,"7,200,000"
+Deadpool,flyingSpeedmph,0
+Wonder Woman,mortality,immortal
+Thor,mortality,immortal
+Storm,mortality,mortal
+Superman,mortality,mortal
+Deadpool,mortality,immortal
+Wonder Woman,age,5000
+Thor,age,29
+Storm,age,300
+Superman,age,29
+Deadpool,age,45

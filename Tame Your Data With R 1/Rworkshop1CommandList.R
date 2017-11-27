@@ -1,6 +1,5 @@
 library(tidyverse)
-setwd("~/Desktop")
-super <- read_csv("~/Desktop/superheroes.csv")
+super <- read_csv("superheroes.csv")
 head(super)
 tail(super)
 
@@ -10,7 +9,7 @@ table(super)
 super %>% table()
 super %>% select(age, sex) %>% table() 
 
-super <- read_csv("~/Desktop/superheroes.csv", na = c("","0","NA"))
+super <- read_csv("superheroes.csv", na = c("","0","NA"))
 super %>% head()
 super %>% tail()
 
@@ -32,7 +31,7 @@ super %>% filter(sex == 'female') %>% select(alignment) %>% table() %>% which.ma
 super <- super %>% replace_na(list(alignment = super %>% filter(sex == 'female') %>% select(alignment) %>% table() %>% which.max() %>% names()))
 super
 
-second <- read_csv("~/Desktop/characteristics.csv")
+second <- read_csv("characteristics.csv")
 second %>% head()
 second
 secondWide <- second %>% spread(status, measurement)

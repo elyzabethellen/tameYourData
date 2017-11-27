@@ -6,56 +6,35 @@ output:
   html_document: default
   pdf_document: default
 ---
-
+##Getting Started
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-```{r tidyItUp}
+Download these datasets to your desktop.
+DATASET 1: http://cs.unm.edu/~elizabeth/superheroes.csv  
+DATASET 2: http://cs.unm.edu/~elizabeth/characteristics.csv  
+
+```{r tidyItUp, message=FALSE}
+#Load the Tidyverse
 library(tidyverse)
 ```
-```{r DatasetIntoPlace}
-super <- read_csv('superheroes.csv') 
+```{r DatasetIntoPlace, message=FALSE}
+#Read the cleaned superhero data
+super <- read_csv('newSuperheroes.csv') 
 ```
+
 
 ##Transform
 We'll bring in a second dataset here, transform it, and then transform our original dataset by doing a join on superhero names. For brevity's sake, assume this one is already tidied up. 
 ```{r bringInSecond, message=FALSE}
 #Import the second set and take a look at the first few rows
-second <- read_csv("~/Desktop/characteristics.csv")
+second <- read_csv('newCharacteristics.csv')
 second %>% head()
 ```
 Huh. It looks like the name column repeats itself. Let's get a wider view...
 ```{r bringInSecond2, message=FALSE}
 second
 ```
-
-###spread and gather
-It definitely does. This data is a great candidate for transformation. Let's break up that status column into separate factors:
-```{r spread}
-#Import the second set and take a look at the first few rows
-secondWide <- second %>% spread(status, measurement)
-secondWide
-```
-
-The Tidyverse `gather` function will help you do the opposite--go from wide to long. To learn more about that function, you can type:
-```{r gather}
-help("gather")
-```
-You can do this with most functions in R to get some more details about them.
-
-Note that the result of `spread` was sorted alphabetically by the first column.
-We really care about who's the fastest, though:
-```{r sortby}
-#Sort by speed
-#ascending order
-secondWide <- secondWide %>% arrange(flyingSpeedmph)
-secondWide
-#descending order
-secondWide <- secondWide %>% arrange(desc(flyingSpeedmph))
-secondWide
-```
-
-This looks like what we want. Let's merge with our `super` dataset.
 
 ###joins  
 Don't be scared!  
@@ -67,18 +46,44 @@ help("inner_join")
 ```
 >Return all rows from x where there are matching values in y, and all columns from x and y. If there are multiple matches >between x and y, all combination of the matches are returned. This is a mutating join.
 
-We'll give our `super` dataset as x, because we want to keep all of the characters in `super` that also appear in `secondWide`. `secondWide` will be given second as y.  
+We'll give our `super` dataset as x, because we want to keep all of the characters in `super` that also appear in `second`. `second` will be given second as y.  
 *What is a mutating join?*: It's some database terminology. It just means you can add variables to the LHS.
 ```{r inner}
 #Try an inner join
-inner_join(super, secondWide)
+inner_join(super, second)
 #The Tidyverse way: use pipes for first function argument 'x'
-#Doesn't make a difference here but a good habit to get into
-super %>% inner_join(secondWide)
+#Same result
+super %>% inner_join(second)
 ```
 Notice we were automatically joined on name. We kept all characters that appeared in *both* datasets and merged all attributes given in both.
 
+###spread and gather
+It definitely does. This data is a great candidate for transformation. Let's break up that status column into separate factors:
+```{r spread}
+#Use the spread command to spread the status column out. (Go to "wide.")
+secondWide <- second %>% spread(status, measurement, convert=TRUE)
+secondWide
+```
 
+The Tidyverse `gather` function will help you do the opposite--go from wide to long. To learn more about that function, you can type:
+```{r gather}
+help("gather")
+```
+You can do this with most functions in R to get some more details about them.
+
+Note that the result of `spread` was sorted alphabetically by the first column.
+Who's the fastest? The slowest?
+```{r sortby}
+#Sort by speed
+#ascending order
+secondWide %>% arrange(flyingSpeedmph)
+
+#descending order
+secondWide %>% arrange(desc(flyingSpeedmph))
+
+```
+
+This looks like what we want. 
 ####semi_join(x, y)  
 >return all rows from x where there are matching values in y, keeping just columns from x
 ```{r semi}
@@ -114,12 +119,15 @@ and working backwards from there.
 
 ### Categorical bar chart
 Let's compare alignment between the sexes.
+Who's more evil?
+ 
 ```{r align}
 result %>% ggplot(aes(sex)) +
   geom_bar(aes(fill=alignment)) 
 ```
 
 ### Lollipop charts
+Let's do some exploration of ages.
 ```{r lollipop}
 result %>% ggplot(aes(x=name, y=age, label=age )) + 
   geom_point(stat='identity', fill="black", size=8) +

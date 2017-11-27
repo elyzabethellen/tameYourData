@@ -4,8 +4,8 @@ Thor,homePlanet,Asgard
 Storm,homePlanet,Earth
 Superman,homePlanet,Krypton
 Deadpool,homePlanet,Earth
-Wonder Woman,flyingSpeedmph,"5,100,000"
-Thor,flyingSpeedmph,24000
-Storm,flyingSpeedmph,1000
-Superman,flyingSpeedmph,"7,200,000"
-Deadpool,flyingSpeedmph,0
+Wonder Woman,flyingSpeedmph,5100000.00
+Thor,flyingSpeedmph,24000.00
+Storm,flyingSpeedmph,1000.00
+Superman,flyingSpeedmph,7200000.00
+Deadpool,flyingSpeedmph,0.00
