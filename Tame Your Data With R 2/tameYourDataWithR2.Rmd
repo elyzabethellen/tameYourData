@@ -89,24 +89,20 @@ super %>% semi_join(secondWide)
 ```
 Here, our names were filtered by just the ones that appeared in both datasets, but we didn't pick up the extra columns from the `secondWide` dataset.
 
-####anti_join(x, y)
->return all rows from x where there are not matching values in y, keeping just columns from x.
-```{r anti}
-super %>% anti_join(secondWide)
-```
-In this case, we exclude all characters that appear in both x and y but still keep just columns from x.  
-
 ####full_join(x, y)  
 >return all rows and all columns from both x and y. Where there are not matching values, returns NA for the one missing.
 ```{r full}
-super %>% full_join(secondWide)
+full <- super %>% full_join(secondWide)
+full
 ```
-Let's do an anti join one more time and save the result:
-```{r innerAgain}
+####anti_join(x, y)
+>return all rows from x where there are not matching values in y, keeping just columns from x.
+```{r anti}
 result <- super %>% anti_join(secondWide)
 result
 ```
-Our dataset has come a long way since the beginning! Let's close by exploring some visualizations.
+In this case, we exclude all characters that appear in both x and y but still keep just columns from x.  
+Let's close by exploring some visualizations.
 
 
 ## Visualize
@@ -119,10 +115,15 @@ and working backwards from there.
 Let's compare alignment between the sexes.
 Who's more evil?
  
-```{r align}
+```{r alignAnti}
 result %>% ggplot(aes(sex)) +
   geom_bar(aes(fill=alignment)) 
 ```
+```{r alignFull}
+f %>% ggplot(aes(sex)) +
+  geom_bar(aes(fill=alignment)) 
+```
+
 
 ### Lollipop charts
 Let's do some exploration of ages.
