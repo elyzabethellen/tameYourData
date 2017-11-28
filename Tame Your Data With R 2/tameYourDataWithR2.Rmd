@@ -111,22 +111,26 @@ The `ggplot2` library provides an extensive set of tools to help you create beau
 http://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.html#Ordered%20Bar%20Chart
 and working backwards from there.  
 
+## QUESTION 1: WHO'S BAD?
 ### Categorical bar chart
 Let's compare alignment between the sexes.
-Who's more evil?
+Who's more evil in our anti-joined result?
  
 ```{r alignAnti}
 result %>% ggplot(aes(sex)) +
   geom_bar(aes(fill=alignment)) 
 ```
+
+How about our full-joined result?
 ```{r alignFull}
-f %>% ggplot(aes(sex)) +
+full %>% ggplot(aes(sex)) +
   geom_bar(aes(fill=alignment)) 
 ```
+Here you can see how NAs are handled in plotting. As a bonus exercise, handle the NAs in the full join and re-plot.
 
-
+##QUESTION 2: WHO'S OLDER AND YOUNGER THAN BATMAN?
 ### Lollipop charts
-Let's do some exploration of ages.
+
 ```{r lollipop}
 result %>% ggplot(aes(x=name, y=age, label=age )) + 
   geom_point(stat='identity', fill="black", size=8) +
