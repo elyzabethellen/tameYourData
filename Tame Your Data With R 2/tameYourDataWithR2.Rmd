@@ -119,8 +119,11 @@ superAnti %>% ggplot(aes(sex)) +
   geom_bar(aes(fill=alignment)) 
 ```
 
-How about our spread full-joined result? Our semi-join result? Our spread inner-joined result?
-How can we handle NA's?
+#Exercise:
+##How about our spread full-joined result? 
+##Our semi-join result? 
+##Our spread inner-joined result?
+##How can we handle NA's?
 
 ##QUESTION 2: WHO'S OLDER AND YOUNGER THAN BATMAN?
 ### Lollipop charts
