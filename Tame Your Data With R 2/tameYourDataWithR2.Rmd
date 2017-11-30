@@ -19,13 +19,12 @@ DATASET 2: http://cs.unm.edu/~elizabeth/newCharacteristics.csv
 library(tidyverse)
 ```
 ```{r DatasetIntoPlace, message=FALSE}
-#Read the cleaned superhero data
+#Read in the superhero data
 super <- read_csv('newSuperheroes.csv') 
 ```
 
-
 ##Transform
-We'll bring in a second dataset here, transform it, and then transform our original dataset by doing a join on superhero names. For brevity's sake, this one is already tidied up.Let's take a look at it first.
+We'll bring in a second dataset here, transform it, and then transform our original dataset by doing some different joins of these two datasets.
 ```{r bringInSecond, message=FALSE}
 #Import the second set and take a look at the first few rows
 second <- read_csv('newCharacteristics.csv')
@@ -35,7 +34,7 @@ Huh. It looks like the name column repeats itself. Let's get a more complete vie
 ```{r bringInSecond2, message=FALSE}
 second
 ```
-I think we should do a transformation here, but let's do it after the join, so we transform all at once. 
+I think we should do a transformation here, but let's do it after the join, so we can transform all at once. 
 
 ###joins  
 Don't be scared! Take it slow. 
@@ -59,11 +58,11 @@ superInner <- super %>% inner_join(second)
 Notice we were automatically joined on name. We kept all characters that appeared in *both* datasets and merged all attributes given in both.
 
 ###spread and gather
-This data is a great candidate for transformation. Let's break up that status column into separate factors by using spread:
+This data is a great candidate for transformation. Let's break up that status column into separate factors by using spread to make it a wide format:
 ```{r spread}
 #Use the spread command to spread the status column out. (Go to "wide.")
-superInnerWide <- superInner %>% spread(status, measurement, convert=TRUE)
-superInnerWide
+superInnerSpread <- superInner %>% spread(status, measurement, convert=TRUE)
+superInnerSpread
 ```
 
 (We'll just have time to practice the spread function today, but the Tidyverse `gather` function will help you do the opposite--go from wide to long. To learn more about that function, you can type:
@@ -100,9 +99,9 @@ superFullSpread
 superAnti <- super %>% anti_join(second)
 superAnti
 ```
-In this case, we exclude all characters that appear in both x and y but still keep just columns from x.  
-Let's close by exploring some visualizations.
 
+In this case, we *exclude* all characters that appear in both x and y but still keep just columns from x.  
+Let's close by exploring some visualizations.
 
 ## Visualize
 
@@ -116,22 +115,18 @@ Let's compare alignment between the sexes.
 Who's more evil in our anti-joined result?
  
 ```{r alignAnti}
-result %>% ggplot(aes(sex)) +
+superAnti %>% ggplot(aes(sex)) +
   geom_bar(aes(fill=alignment)) 
 ```
 
-How about our full-joined result?
-```{r alignFull}
-superFullSpread %>% ggplot(aes(sex)) +
-  geom_bar(aes(fill=alignment)) 
-```
-Here you can see how NAs are handled in plotting. As a bonus exercise, handle the NAs in the full join and re-plot.
+How about our spread full-joined result? Our semi-join result? Our spread inner-joined result?
+How can we handle NA's?
 
 ##QUESTION 2: WHO'S OLDER AND YOUNGER THAN BATMAN?
 ### Lollipop charts
 
 ```{r lollipop}
-result %>% ggplot(aes(x=name, y=age, label=age )) + 
+superAnti %>% ggplot(aes(x=name, y=age, label=age )) + 
   geom_point(stat='identity', fill="black", size=8) +
   geom_segment(aes(y = 0, 
                    x = name, 
@@ -140,9 +135,11 @@ result %>% ggplot(aes(x=name, y=age, label=age )) +
                color = "black") +
   coord_flip()
 ```
+
+
 Loki is throwing things off here. Let's take him out:  
 ```{r lollipop2}
-result %>% filter(name != "Loki") %>% ggplot(aes(x=name, y=age, label=age )) + 
+superAnti %>% filter(name != "Loki") %>% ggplot(aes(x=name, y=age, label=age )) + 
   geom_point(stat='identity', fill="black", size=8) +
   geom_segment(aes(y = 0, 
                    x = name, 
@@ -155,7 +152,7 @@ Much better!
 
 Let's add a little text in the dots for clarity and set our 'baseline' age to 32:
 ```{r lollipop3}
-result %>% filter(name != "Loki") %>% ggplot(aes(x=name, y=age, label=age )) + 
+superAnti %>% filter(name != "Loki") %>% ggplot(aes(x=name, y=age, label=age )) + 
   geom_point(stat='identity', fill="black", size=8) +
   geom_segment(aes(y = 32, 
                    x = name, 
