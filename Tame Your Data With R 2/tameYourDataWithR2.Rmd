@@ -25,19 +25,20 @@ super <- read_csv('newSuperheroes.csv')
 
 
 ##Transform
-We'll bring in a second dataset here, transform it, and then transform our original dataset by doing a join on superhero names. For brevity's sake, assume this one is already tidied up. 
+We'll bring in a second dataset here, transform it, and then transform our original dataset by doing a join on superhero names. For brevity's sake, this one is already tidied up.Let's take a look at it first.
 ```{r bringInSecond, message=FALSE}
 #Import the second set and take a look at the first few rows
 second <- read_csv('newCharacteristics.csv')
 second %>% head()
 ```
-Huh. It looks like the name column repeats itself. Let's get a wider view...
+Huh. It looks like the name column repeats itself. Let's get a more complete view...
 ```{r bringInSecond2, message=FALSE}
 second
 ```
+I think we should do a transformation here, but let's do it after the join, so we transform all at once. 
 
 ###joins  
-Don't be scared!  
+Don't be scared! Take it slow. 
 
 ####inner join(x, y)
 From the documentation:
@@ -53,53 +54,51 @@ We'll give our `super` dataset as x, because we want to keep all of the characte
 inner_join(super, second)
 #The Tidyverse way: use pipes for first function argument 'x'
 #Same result
-super %>% inner_join(second)
+superInner <- super %>% inner_join(second)
 ```
 Notice we were automatically joined on name. We kept all characters that appeared in *both* datasets and merged all attributes given in both.
 
 ###spread and gather
-This data is a great candidate for transformation. Let's break up that status column into separate factors:
+This data is a great candidate for transformation. Let's break up that status column into separate factors by using spread:
 ```{r spread}
 #Use the spread command to spread the status column out. (Go to "wide.")
-secondWide <- second %>% spread(status, measurement, convert=TRUE)
-secondWide
+superInnerWide <- superInner %>% spread(status, measurement, convert=TRUE)
+superInnerWide
 ```
 
-The Tidyverse `gather` function will help you do the opposite--go from wide to long. To learn more about that function, you can type:
+(We'll just have time to practice the spread function today, but the Tidyverse `gather` function will help you do the opposite--go from wide to long. To learn more about that function, you can type:
 ```{r gather}
 help("gather")
 ```
-You can do this with most functions in R to get some more details about them.
+You can do this with most functions in R to get some more details about them.)
 
-Note that the result of `spread` was sorted alphabetically by the first column.
-Who's the fastest? The slowest?
-```{r sortby}
-#Sort by speed
-#ascending order
-secondWide %>% arrange(flyingSpeedmph)
-
-#descending order
-secondWide %>% arrange(desc(flyingSpeedmph))
-
-```
+Let's learn more joins and practice using the spread function to transform them.
 ####semi_join(x, y)  
 >return all rows from x where there are matching values in y, keeping just columns from x
 ```{r semi}
-super %>% semi_join(secondWide)
+superSemi <- super %>% semi_join(second)
+superSemi
 ```
-Here, our names were filtered by just the ones that appeared in both datasets, but we didn't pick up the extra columns from the `secondWide` dataset.
+Here, our names were filtered by just the ones that appeared in both datasets, but we didn't pick up the extra columns from the `second` dataset like we did in the inner join. There's nothing to spread on. Let's try a full join now.
 
 ####full_join(x, y)  
 >return all rows and all columns from both x and y. Where there are not matching values, returns NA for the one missing.
 ```{r full}
-full <- super %>% full_join(secondWide)
-full
+superFull <- super %>% full_join(second)
+superFull
 ```
+
+...and spread it out.
+```{r fullSpread}
+superFullSpread <- superFull %>% spread(status, measurement, convert=TRUE, fill="FILL ME!")
+superFullSpread
+```
+
 ####anti_join(x, y)
 >return all rows from x where there are not matching values in y, keeping just columns from x.
 ```{r anti}
-result <- super %>% anti_join(secondWide)
-result
+superAnti <- super %>% anti_join(second)
+superAnti
 ```
 In this case, we exclude all characters that appear in both x and y but still keep just columns from x.  
 Let's close by exploring some visualizations.
@@ -123,7 +122,7 @@ result %>% ggplot(aes(sex)) +
 
 How about our full-joined result?
 ```{r alignFull}
-full %>% ggplot(aes(sex)) +
+superFullSpread %>% ggplot(aes(sex)) +
   geom_bar(aes(fill=alignment)) 
 ```
 Here you can see how NAs are handled in plotting. As a bonus exercise, handle the NAs in the full join and re-plot.

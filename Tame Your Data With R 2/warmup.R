@@ -1,3 +1,4 @@
+library(tidyverse)
 a <- 1
 b <- 2
 a + b
@@ -13,6 +14,10 @@ x * y
 y + y
 z <- c(10, 10, 10, 10)
 y + z
+c <- cars
 spd <- cars %>% select(speed)
-spd %>% max()
-spd %>% min()
+noSpd <- cars %>% subset(select = -c(speed))
+cars
+noSpd
+maxSpd <- spd %>% max()
+cars %>% select(speed) %>% max()
