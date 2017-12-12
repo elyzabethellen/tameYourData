@@ -231,9 +231,12 @@ superInnerSpread</code></pre>
 ## # ... with 2 more variables: homePlanet &lt;chr&gt;, mortality &lt;chr&gt;</code></pre>
 <p>(We’ll just have time to practice the spread function today, but the Tidyverse <code>gather</code> function will help you do the opposite–go from wide to long. To learn more about that function, you can type:</p>
 <pre class="r"><code>help(&quot;gather&quot;)</code></pre>
-<p>You can do this with most functions in R to get some more details about them.)</p>
-<p>Let’s learn more joins and practice using the spread function to transform them. ####semi_join(x, y)<br />
-&gt;return all rows from x where there are matching values in y, keeping just columns from x</p>
+<p>You can do this with most functions in R to get some more details about them.) Let’s learn more joins and practice using the spread function to transform them.</p>
+<div id="semi_joinx-y" class="section level4">
+<h4>semi_join(x, y)</h4>
+<blockquote>
+<p>return all rows from x where there are matching values in y, keeping just columns from x</p>
+</blockquote>
 <pre class="r"><code>superSemi &lt;- super %&gt;% semi_join(second)</code></pre>
 <pre><code>## Joining, by = &quot;name&quot;</code></pre>
 <pre class="r"><code>superSemi</code></pre>
@@ -245,6 +248,7 @@ superInnerSpread</code></pre>
 ## 3 Wonder Woman      good female  5000        DC
 ## 4     Superman      good   male    29        DC</code></pre>
 <p>Here, our names were filtered by just the ones that appeared in both datasets, but we didn’t pick up the extra columns from the <code>second</code> dataset like we did in the inner join. There’s nothing to spread on. Let’s try a full join now.</p>
+</div>
 <div id="full_joinx-y" class="section level4">
 <h4>full_join(x, y)</h4>
 <blockquote>

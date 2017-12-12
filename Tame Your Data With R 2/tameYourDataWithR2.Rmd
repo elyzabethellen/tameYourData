@@ -70,9 +70,10 @@ superInnerSpread
 help("gather")
 ```
 You can do this with most functions in R to get some more details about them.)
-
 Let's learn more joins and practice using the spread function to transform them.
+
 ####semi_join(x, y)  
+
 >return all rows from x where there are matching values in y, keeping just columns from x
 ```{r semi}
 superSemi <- super %>% semi_join(second)
